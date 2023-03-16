@@ -380,11 +380,11 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
                               ${widget.htmlEditorOptions.customOptions}
                               $summernoteCallbacks
                           });
-                          
+
                           \$('#summernote-2').on('summernote.change', function(_, contents, \$editable) {
                             window.flutter_inappwebview.callHandler('onChangeContent', contents);
                           });
-                      
+
                           function onSelectionChange() {
                             let {anchorNode, anchorOffset, focusNode, focusOffset} = document.getSelection();
                             var isBold = false;
@@ -452,14 +452,18 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
                       await controller.evaluateJavascript(
                           source:
                               "document.getElementsByClassName('note-editable')[0].setAttribute('inputmode', '${describeEnum(widget.htmlEditorOptions.inputType)}');");
-                      if ((Theme.of(context).brightness == Brightness.dark ||
-                              widget.htmlEditorOptions.darkMode == true) &&
-                          widget.htmlEditorOptions.darkMode != false) {
-                        //todo fix for iOS (https://github.com/pichillilorenzo/flutter_inappwebview/issues/695)
-                        var darkCSS =
-                            '<link href=\"${(widget.htmlEditorOptions.filePath != null ? "file:///android_asset/flutter_assets/packages/html_editor_enhanced/assets/" : "") + "summernote-lite-dark.css"}\" rel=\"stylesheet\">';
-                        await controller.evaluateJavascript(
-                            source: "\$('head').append('$darkCSS');");
+                      try{
+                        if (widget.htmlEditorOptions.darkMode != false && (Theme.of(context).brightness == Brightness.dark ||
+                                widget.htmlEditorOptions.darkMode == true)
+                            ) {
+                          //todo fix for iOS (https://github.com/pichillilorenzo/flutter_inappwebview/issues/695)
+                          var darkCSS =
+                              '<link href=\"${(widget.htmlEditorOptions.filePath != null ? "file:///android_asset/flutter_assets/packages/html_editor_enhanced/assets/" : "") + "summernote-lite-dark.css"}\" rel=\"stylesheet\">';
+                          await controller.evaluateJavascript(
+                              source: "\$('head').append('$darkCSS');");
+                        }
+                      }catch(e){
+                        print('HTML Editor Catch');
                       }
                       //set the text once the editor is loaded
                       if (widget.htmlEditorOptions.initialText != null) {
